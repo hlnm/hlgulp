@@ -1,31 +1,47 @@
 const gulp = require('gulp');
 const p = require('gulp-load-plugins')();
+const handleError = require('./gulp-config/handleError');
+const clean = require('gulp-clean');
+const pngquant = require('imagemin-pngquant');
 
-var handleError = function (err) {
-    var colors = gutil.colors;
-    console.log('\n')
-    gutil.log(colors.red('Error!'))
-    gutil.log('fileName: ' + colors.red(err.fileName))
-    gutil.log('lineNumber: ' + colors.red(err.lineNumber))
-    gutil.log('message: ' + err.message)
-    gutil.log('plugin: ' + colors.yellow(err.plugin))
-}
+const config = require('./gulp-config/config');
+
+
 gulp.task('mincss',()=>{
     gulp.src('src/css/*.css')
-        .pipe(p.plumber({
-            errorHandler: function (error){
-                console.log(error.message);
-                this.emit('end');
-            }
-        }))
         .pipe(p.minifyCss())
+        
         .pipe(gulp.dest('dist/css'))
+        .pipe(p.plumber({errorHandler: handleError}))
+        
 
 });
 
-gulp.task('')
+gulp.task('clean',()=>{
+    gulp.src(config.clean.src)
+        .pipe(clean());
+})
 
-gulp.task('default',['mincss']);
+gulp.task('img',()=>{
+    gulp.src(config.img.src)
+        .pipe(gulp.dest(config.img.dist))
+})
+
+gulp.task('imgmin',()=>{
+    gulp.src(config.img.src)
+        .pipe(p.cache(p.imagemin({
+            progressive: true,
+            svgoPlugins: [{removeViewBox: false}],
+            use:[pngquant()]
+        })))
+        .pipe(gulp.dest(config.img.dist))
+})
+
+
+gulp.task('default',['mincss','imgmin']);
+
+gulp.task('deploy',['mincss','imgmin']);
+
 
 gulp.watch('src/**',['default']);
 
