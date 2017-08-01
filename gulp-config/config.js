@@ -19,9 +19,17 @@ module.exports = {
         }
     },
     js:{
-        all: src+'/js/**/*js',
+        all: src+'/js/**/*.js',
         src:src+'/js/*.js',
         dist:dist+'/js',
+        settings:{
+
+        }
+    },
+    jade:{
+        all: src+'/jade/**/*.jade',
+        src:src+'/jade/*.jade',
+        dist:dist+'/',
         settings:{
 
         }
